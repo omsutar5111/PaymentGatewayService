@@ -4,6 +4,7 @@ import com.stripe.Stripe;
 import com.stripe.model.PaymentLink;
 import com.stripe.model.Price;
 import com.stripe.param.PaymentLinkCreateParams;
+import com.stripe.param.PaymentLinkCreateParams.SubmitType;
 import com.stripe.param.PriceCreateParams;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
@@ -39,19 +40,26 @@ public class StripeAdapter implements PaymentGatewayAdapter {
 		String priceId=price.getId();
 //		Stripe.apiKey = "sk_test_51PjkFAP8GATQRGYgVcOWD1CvkznKZnlUOviNgFzNg4ChJtzwcWBddJoG1hBb419PjhyMK0xZXWz581vdxcs2kipz00y5jTCCCn";
 
-		PaymentLinkCreateParams paramsLink =
-				PaymentLinkCreateParams.builder()
-						.addLineItem(
-								PaymentLinkCreateParams.LineItem.builder()
-										.setPrice(priceId)
-										.setQuantity(1L)
-										.build()
-						)
-						.build();
-
-		PaymentLink paymentLink = PaymentLink.create(paramsLink);
-
-		return paymentLink.getUrl();
+		 PaymentLinkCreateParams paymentLinkparams =
+	                PaymentLinkCreateParams.builder()
+	                        .addLineItem(
+	                                PaymentLinkCreateParams.LineItem.builder()
+	                                        .setPrice(priceId)
+	                                        .setQuantity(1L)
+	                                        .build()
+	                        )
+	                        .setAfterCompletion(PaymentLinkCreateParams.AfterCompletion.builder()
+	                                .setRedirect(
+	                                        PaymentLinkCreateParams.AfterCompletion.Redirect.builder()
+	                                        .setUrl("https://scaler.com")
+	                                        .build()
+	                                )
+	                                .setType(PaymentLinkCreateParams.AfterCompletion.Type.REDIRECT)
+	                                .build()
+	                        )
+	                        .build();
+	        PaymentLink paymentLink = PaymentLink.create(paymentLinkparams);
+	        return paymentLink.getUrl();
 	}
 
 }
